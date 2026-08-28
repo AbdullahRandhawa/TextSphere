@@ -1,0 +1,284 @@
+/* ============================================================
+   TextSphere — Global Design System
+   Dark-mode premium UI
+   ============================================================ */
+
+/* ── Google Fonts are loaded in index.html ─────────────────── */
+
+/* ── CSS Custom Properties ────────────────────────────────── */
+:root {
+  /* Palette */
+  --clr-bg:            #0a0d14;
+  --clr-surface:       #111622;
+  --clr-surface-2:     #181f2e;
+  --clr-surface-3:     #1e2638;
+  --clr-border:        rgba(255,255,255,0.07);
+  --clr-border-accent: rgba(99,179,255,0.25);
+
+  --clr-primary:       #63b3ff;
+  --clr-primary-glow:  rgba(99,179,255,0.18);
+  --clr-primary-dark:  #2563eb;
+  --clr-accent:        #a78bfa;
+  --clr-accent-glow:   rgba(167,139,250,0.18);
+  --clr-success:       #34d399;
+  --clr-warning:       #fbbf24;
+  --clr-error:         #f87171;
+  --clr-error-glow:    rgba(248,113,113,0.15);
+
+  --clr-text:          #e8edf5;
+  --clr-text-2:        #9aa5b8;
+  --clr-text-3:        #5c6b84;
+
+  /* Tool-chip palette */
+  --chip-sentiment:     #f472b6;
+  --chip-topic:         #fb923c;
+  --chip-ner:           #34d399;
+  --chip-summarization: #a78bfa;
+  --chip-qa:            #63b3ff;
+
+  /* Spacing */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 20px;
+  --sp-6: 24px;
+  --sp-8: 32px;
+  --sp-10: 40px;
+  --sp-12: 48px;
+
+  /* Radii */
+  --r-sm:   6px;
+  --r-md:   12px;
+  --r-lg:   18px;
+  --r-xl:   24px;
+  --r-full: 9999px;
+
+  /* Typography */
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+
+  /* Shadows */
+  --shadow-sm:   0 1px 3px rgba(0,0,0,0.4);
+  --shadow-md:   0 4px 16px rgba(0,0,0,0.5);
+  --shadow-lg:   0 8px 32px rgba(0,0,0,0.6);
+  --shadow-glow: 0 0 24px rgba(99,179,255,0.12);
+
+  /* Transitions */
+  --t-fast: 120ms ease;
+  --t-med:  220ms ease;
+  --t-slow: 400ms ease;
+
+  /* Layout */
+  --sidebar-width: 280px;
+}
+
+/* ── Reset & Base ─────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--clr-text);
+  background-color: var(--clr-bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow: hidden;
+}
+
+/* ── Scrollbar ─────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--clr-surface-3); border-radius: var(--r-full); }
+::-webkit-scrollbar-thumb:hover { background: var(--clr-text-3); }
+
+/* ── Typography ───────────────────────────────────────────── */
+h1, h2, h3, h4 { font-weight: 600; line-height: 1.3; }
+code, pre { font-family: var(--font-mono); }
+a { color: var(--clr-primary); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* ── Buttons ──────────────────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-2) var(--sp-4);
+  border-radius: var(--r-md);
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 500;
+  transition: background var(--t-fast), box-shadow var(--t-fast), transform var(--t-fast);
+  outline: none;
+  white-space: nowrap;
+}
+.btn:active { transform: scale(0.97); }
+.btn:focus-visible { outline: 2px solid var(--clr-primary); outline-offset: 2px; }
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--clr-primary-dark), var(--clr-primary));
+  color: #fff;
+  box-shadow: 0 2px 12px rgba(37,99,235,0.35);
+}
+.btn-primary:hover { box-shadow: 0 4px 20px rgba(37,99,235,0.5); }
+
+.btn-ghost {
+  background: transparent;
+  color: var(--clr-text-2);
+  border: 1px solid var(--clr-border);
+}
+.btn-ghost:hover { background: var(--clr-surface-2); color: var(--clr-text); }
+
+.btn-danger {
+  background: transparent;
+  color: var(--clr-error);
+  border: 1px solid rgba(248,113,113,0.3);
+}
+.btn-danger:hover { background: var(--clr-error-glow); }
+
+.btn-icon {
+  background: transparent;
+  border: none;
+  color: var(--clr-text-3);
+  padding: var(--sp-1) var(--sp-2);
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  transition: color var(--t-fast), background var(--t-fast);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+}
+.btn-icon:hover { color: var(--clr-text); background: var(--clr-surface-3); }
+
+/* ── Inputs ───────────────────────────────────────────────── */
+.input, .textarea {
+  width: 100%;
+  background: var(--clr-surface-2);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--r-md);
+  color: var(--clr-text);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  padding: var(--sp-3) var(--sp-4);
+  transition: border-color var(--t-fast), box-shadow var(--t-fast);
+  outline: none;
+  resize: none;
+}
+.input:focus, .textarea:focus {
+  border-color: var(--clr-primary);
+  box-shadow: 0 0 0 3px var(--clr-primary-glow);
+}
+.input::placeholder, .textarea::placeholder { color: var(--clr-text-3); }
+.textarea { min-height: 100px; }
+
+/* ── Chip / Badge ─────────────────────────────────────────── */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-1);
+  padding: 2px var(--sp-2);
+  border-radius: var(--r-full);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.chip-sentiment     { background: rgba(244,114,182,0.15); color: var(--chip-sentiment); }
+.chip-topic         { background: rgba(251,146,60,0.15);  color: var(--chip-topic); }
+.chip-ner           { background: rgba(52,211,153,0.15);  color: var(--chip-ner); }
+.chip-summarization { background: rgba(167,139,250,0.15); color: var(--chip-summarization); }
+.chip-qa            { background: rgba(99,179,255,0.15);  color: var(--chip-qa); }
+
+/* ── Utility ──────────────────────────────────────────────── */
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0,0,0,0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ── Loading spinner ──────────────────────────────────────── */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+.spinner {
+  width: 18px; height: 18px;
+  border: 2px solid var(--clr-border);
+  border-top-color: var(--clr-primary);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  display: inline-block;
+}
+
+/* ── Fade in animation ────────────────────────────────────── */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.fade-in-up {
+  animation: fadeInUp var(--t-med) both;
+}
+
+/* ── Typing cursor ────────────────────────────────────────── */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+.typing-cursor::after {
+  content: '▋';
+  margin-left: 2px;
+  animation: blink 1s step-end infinite;
+  color: var(--clr-primary);
+}
+
+/* ── Tooltip ──────────────────────────────────────────────── */
+[data-tooltip] {
+  position: relative;
+}
+[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--clr-surface-3);
+  color: var(--clr-text);
+  border: 1px solid var(--clr-border-accent);
+  border-radius: var(--r-md);
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.45;
+  white-space: pre-line;
+  word-break: normal;
+  width: max-content;
+  min-width: 200px;
+  max-width: 280px;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 150ms ease, visibility 150ms ease, transform 150ms ease;
+  z-index: 9999;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+  text-align: left;
+}
+[data-tooltip]:hover::after {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(-2px);
+}

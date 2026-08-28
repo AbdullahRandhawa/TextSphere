@@ -1,0 +1,23 @@
+# Backend
+backend/.env
+backend/firebase_credentials.json
+backend/__pycache__/
+backend/**/__pycache__/
+backend/.venv/
+backend/venv/
+
+# Frontend
+frontend/.env
+frontend/node_modules/
+frontend/dist/
+
+# Models (large binary files — place in workspace root, not committed)
+distilbert_sst2/
+distilbert_agnews/
+bert_conll2003_ner/
+t5_cnn_dailymail_summarization/
+distilbert_squad_qa/
+
+# OS
+.DS_Store
+Thumbs.db
