@@ -33,20 +33,27 @@ issues = 0
 print("\n=== TextSphere Setup Check ===================================")
 
 # ── 1. Model folders ──────────────────────────────────────────────
-print("\n[1] Model folders (workspace root)")
+print("\n[1] Fine-tuned model folders (backend/app/finetuned_models/)")
+FINETUNED = BACKEND / "app" / "finetuned_models"
 models = {
-    "sentiment":     ROOT / "distilbert_sst2",
-    "topic":         ROOT / "distilbert_agnews",
-    "ner":           ROOT / "bert_conll2003_ner",
-    "summarization": ROOT / "t5_cnn_dailymail_summarization",
-    "qa":            ROOT / "distilbert_squad_qa",
+    "sentiment":     FINETUNED / "sentiment",
+    "topic":         FINETUNED / "topic",
+    "ner":           FINETUNED / "ner",
+    "summarization": FINETUNED / "summarization",
+    "qa":            FINETUNED / "qa",
 }
 for name, path in models.items():
-    ok = path.exists()
-    check(f"{name:<16} {path.name}", ok,
-          f"Missing! Create folder: {path}" if not ok else "")
-    if not ok:
+    # Check for at least one .safetensors weight file
+    has_weights = path.exists() and any(path.glob("*.safetensors"))
+    check(f"{name:<16} {path.relative_to(ROOT)}", has_weights,
+          f"Missing! Run: python download_models.py --model {name}" if not has_weights else "")
+    if not has_weights:
         issues += 1
+
+if issues > 0:
+    print("\n  Tip: download ALL missing models at once with:")
+    print("       pip install gdown && python download_models.py")
+    print("       (configure your Google Drive IDs in download_models.py first)\n")
 
 # ── 2. Firebase credentials JSON ──────────────────────────────────
 print("\n[2] Firebase service-account JSON")

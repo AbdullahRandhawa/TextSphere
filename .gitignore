@@ -11,7 +11,14 @@ frontend/.env
 frontend/node_modules/
 frontend/dist/
 
-# Models (large binary files — place in workspace root, not committed)
+# Models (large binary files — NOT committed to git)
+# Download via: python download_models.py
+backend/app/finetuned_models/ner/
+backend/app/finetuned_models/qa/
+backend/app/finetuned_models/sentiment/
+backend/app/finetuned_models/summarization/
+backend/app/finetuned_models/topic/
+# Legacy workspace-root model folders
 distilbert_sst2/
 distilbert_agnews/
 bert_conll2003_ner/
