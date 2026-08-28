@@ -1,84 +1,53 @@
 """
-tools/_loader.py — Maps checkpoint files with '(1)' in their names to the
-standard HuggingFace filename convention by copying them into a temp directory.
+tools/_loader.py — Resolves model directories for from_pretrained().
 
-Windows file symlinks require admin privileges, so we use shutil.copy2 directly.
-The temp directory is cached per model dir for the process lifetime.
+All files in finetuned_models/ now use standard HuggingFace filenames
+(config.json, model.safetensors, tokenizer.json, etc.) so we can load
+directly from the source directory without any temp-copy step.
+
+The prepare_model_dir() function is kept as the single entry point so
+callers (sentiment.py, ner.py, etc.) don't need to change.
 """
 
 from __future__ import annotations
 
 import logging
-import shutil
-import tempfile
 from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
-# Standard filename aliases — maps every known non-standard name to the
-# standard HuggingFace filename expected by from_pretrained().
-_RENAME_MAP: dict[str, str] = {
-    # Files WITH the (1) suffix (your fine-tuned checkpoints)
-    "config (1).json":           "config.json",
-    "model (1).safetensors":     "model.safetensors",
-    "tokenizer (1).json":        "tokenizer.json",
-    "tokenizer_config (1).json": "tokenizer_config.json",
-    "tokenizer_config (1).json": "tokenizer_config.json",
-    "training_args (1).bin":     "training_args.bin",
-    "vocab (1).txt":             "vocab.txt",
-    "merges (1).txt":            "merges.txt",
-    "special_tokens_map (1).json": "special_tokens_map.json",
-    "spiece (1).model":          "spiece.model",
-    # Already-standard names (copy as-is)
-    "config.json":               "config.json",
-    "model.safetensors":         "model.safetensors",
-    "tokenizer.json":            "tokenizer.json",
-    "tokenizer_config.json":     "tokenizer_config.json",
-    "training_args.bin":         "training_args.bin",
-    "vocab.txt":                 "vocab.txt",
-    "merges.txt":                "merges.txt",
-    "special_tokens_map.json":   "special_tokens_map.json",
-    "spiece.model":              "spiece.model",
-    "generation_config.json":    "generation_config.json",
-    "sentencepiece.bpe.model":   "sentencepiece.bpe.model",
-}
-
-# Process-lifetime cache: source_dir → temp dir path
-_TEMP_CACHE: dict[Path, str] = {}
+# Process-lifetime cache: source_dir → resolved path string
+_DIR_CACHE: dict[Path, str] = {}
 
 
 def prepare_model_dir(source_dir: Path) -> str:
     """
-    Return a path to a temp directory where all checkpoint files use standard
-    HuggingFace names.  Results are cached for the process lifetime.
+    Return the path to the model directory ready for from_pretrained().
 
-    Raises FileNotFoundError if source_dir does not exist.
+    Raises FileNotFoundError if source_dir does not exist or contains
+    no .safetensors weight file.
     """
-    if source_dir in _TEMP_CACHE:
-        return _TEMP_CACHE[source_dir]
+    if source_dir in _DIR_CACHE:
+        return _DIR_CACHE[source_dir]
 
     if not source_dir.exists():
         raise FileNotFoundError(
             f"Model directory not found: {source_dir}\n"
-            "Make sure the fine-tuned model folder exists at that path.\n"
-            "Check backend/app/finetuned_models/ and the directory junctions."
+            "Make sure you have run:  python download_models.py\n"
+            "or manually placed the model files in that directory."
         )
 
-    tmp = tempfile.mkdtemp(prefix=f"ts_{source_dir.name}_")
-    logger.info("Staging model files from '%s' -> '%s'", source_dir.name, tmp)
+    # Verify at least one weight file is present
+    weights = list(source_dir.glob("*.safetensors"))
+    if not weights:
+        raise FileNotFoundError(
+            f"No .safetensors weight file found in: {source_dir}\n"
+            "The directory exists but appears empty or incomplete.\n"
+            "Re-run download_models.py or re-copy the model files."
+        )
 
-    copied = 0
-    for src_file in source_dir.iterdir():
-        if not src_file.is_file():
-            continue
-        dest_name = _RENAME_MAP.get(src_file.name, src_file.name)
-        dest_path = Path(tmp) / dest_name
-        # Skip if already staged (handles duplicates in the rename map)
-        if dest_path.exists():
-            continue
-        shutil.copy2(str(src_file), str(dest_path))
-        copied += 1
+    resolved = str(source_dir.resolve())
+    logger.info("Model '%s' -> %s", source_dir.name, resolved)
+    _DIR_CACHE[source_dir] = resolved
+    return resolved
 
-    logger.info("Staged %d files for model '%s'", copied, source_dir.name)
-    _TEMP_CACHE[source_dir] = tmp
-    return tmp
