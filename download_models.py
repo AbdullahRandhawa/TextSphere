@@ -26,16 +26,26 @@ import sys
 from pathlib import Path
 
 # ---------------------------------------------------------------------------
-# ⚙️  CONFIGURE YOUR GOOGLE DRIVE FOLDER IDs HERE
-#     Replace the placeholder strings with your real folder IDs from Drive.
-#     Each entry should be a shared folder containing all files for that model.
+# ⚙️  GOOGLE DRIVE FOLDER IDs
 # ---------------------------------------------------------------------------
 DRIVE_IDS: dict[str, str] = {
-    "sentiment":     "PASTE_YOUR_DRIVE_FOLDER_ID_FOR_SENTIMENT_HERE",
-    "topic":         "PASTE_YOUR_DRIVE_FOLDER_ID_FOR_TOPIC_HERE",
-    "ner":           "PASTE_YOUR_DRIVE_FOLDER_ID_FOR_NER_HERE",
-    "summarization": "PASTE_YOUR_DRIVE_FOLDER_ID_FOR_SUMMARIZATION_HERE",
-    "qa":            "PASTE_YOUR_DRIVE_FOLDER_ID_FOR_QA_HERE",
+    "sentiment":     "10R9YmDnIKz9XgCiCUqXszl7l4JS_6Y47",
+    "topic":         "15lz2jiavSmRKvzZF5j_wyaTFYdne5cjZ",
+    "ner":           "1RZVF5SEdh6p3wtch9Ep9dzCgh5Det2KA",
+    "summarization": "1F8wuov-ro9yx-5p7qZvh7OLky-xSZzjP",
+    "qa":            "15nZvciSd6tNZ4QoVJFkw34M4C62CbSIV",
+}
+
+_RENAME_MAP = {
+    "config (1).json":           "config.json",
+    "model (1).safetensors":     "model.safetensors",
+    "tokenizer (1).json":        "tokenizer.json",
+    "tokenizer_config (1).json": "tokenizer_config.json",
+    "training_args (1).bin":     "training_args.bin",
+    "vocab (1).txt":             "vocab.txt",
+    "merges (1).txt":            "merges.txt",
+    "special_tokens_map (1).json": "special_tokens_map.json",
+    "spiece (1).model":          "spiece.model",
 }
 
 # Destination: backend/app/finetuned_models/<model_name>/
@@ -91,6 +101,14 @@ def download_model(name: str, folder_id: str, dest: Path, force: bool) -> bool:
 
     try:
         gdown.download_folder(url=url, output=str(dest), quiet=False, use_cookies=False)
+        
+        # Standardize any (1) filenames in-place
+        for src_file in list(dest.iterdir()):
+            if src_file.name in _RENAME_MAP:
+                target = src_file.parent / _RENAME_MAP[src_file.name]
+                if not target.exists():
+                    src_file.rename(target)
+
         if model_is_present(dest):
             print(f"\n  {OK}  {name}: download complete!\n")
             return True
